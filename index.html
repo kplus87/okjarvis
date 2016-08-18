@@ -70,8 +70,8 @@
 		var circle = new Path2D();
 		
 		function layout(){
-			ctx.canvas.width  = window.innerWidth / 3;
-			ctx.canvas.height = window.innerHeight / 3;
+			ctx.canvas.width  = window.innerWidth;
+			ctx.canvas.height = window.innerHeight;
 			var x = c.width / 2;
 			var y = c.height / 2;
 			var radius = Math.min(c.width, c.height) / 4;
@@ -89,19 +89,25 @@
 				var el=document.getElementById("touch");
 				c.ontouchstart = function(e){
 					startrecord();
+          setTimeout(function(){
+            stoprecord();
+          },2500);
 				} 
-				c.ontouchend = function(e){
-					stoprecord();
-				}
+				//c.ontouchend = function(e){
+				//	stoprecord();
+				//}
 			}
 			else{
 				console.log('No Touch');
 				c.onmousedown = function(e){
 					startrecord();
+          setTimeout(function(){
+            stoprecord();
+          },2500);
 				} 
-				c.onmouseup = function(e){
-					stoprecord();
-				}
+			//	c.onmouseup = function(e){
+			//		stoprecord();
+			//	}
 			}
 		}
 			
