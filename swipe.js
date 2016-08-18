@@ -16,6 +16,7 @@ function swipedetect(el, callback){
 
     touchsurface.addEventListener('touchstart', function(e){
         startrecord();
+        alert("recording");
         /*
         var touchobj = e.changedTouches[0]
         swipedir = 'none'
