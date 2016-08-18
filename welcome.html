@@ -50,11 +50,9 @@
 	<body >
 
 		<h1>Alexa Web</h1>
-		<canvas id="white"></canvas>
 		<h2><a href='/start'>Click to Login</a></h2>
 		<br>
 		<h2 style="opacity:0.25;"><a  href='/static/help.html' >Help</a></h2>
-<h2>
 <div style="position:fixed;z-index:20;min-width:100%;min-height:200px;">
 		    <br><br><br>
       <div id="box" class="box" onclick="alert('go')"></div>
@@ -70,7 +68,10 @@
     <input id="ccput" placeholder="ccput" style="min-width:80px;border-bottom:3px solid #007eff">
     <div id="current-status">Loading page</div>
 </div>
-</h2>
+<div style="position:fixed;z-index:19;min-width:100%;min-height:200px;margin-top:200px;">		
+<canvas id="white"></canvas>
+</div>
+
 		<script>
 		function draw(col, text){ 
 			var c=document.getElementById(col);
