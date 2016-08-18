@@ -111,15 +111,15 @@
 </div>
 		<script type="text/javascript">
   function rtd(){
-    var put = $("#ccput");
+   // var put = $("#ccput");
     var A = $("#output").html();
     var B = "HELLO-ALEXA";
     if(A === B){
       setTimeout(function(){
-         put.val('HUZZAH!');
+        //put.val('HUZZAH!');
          
          alert("success");
-        //clearall();
+        clearall();
       },500);
     }   
 }           
@@ -128,7 +128,7 @@ function clearall(){
           $("#stopBtn").click();
         setTimeout(function(){
           $("#startBtn").click();
-          $("#box").mouseUp();
+         // $("#box").mouseUp();
 
       },1500);
 }
