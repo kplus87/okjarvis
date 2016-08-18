@@ -1,0 +1,387 @@
+<HTML>
+	<head>
+		<title>Alexa Client</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		<script src="static/record.js"></script>
+		<style>
+		html, body {
+		  width:  100%;
+		  height: 100%;
+		  margin: 0px;
+		}
+		canvas {
+		    border: 3px solid #ccc;
+		    border-radius: 10px;
+		}
+		#help {
+			position: absolute;
+		    top: 5px;
+		    left: 5px;
+			z-index: 1;
+			font-size: 20px;
+			font-family: Arial, sans-serif;
+		}
+		#logout {
+			position: absolute;
+		    top: 5px;
+		    right: 5px;
+			z-index: 1;
+			font-size: 25px;
+		}
+		a:link {
+		    color: #C0C0C0;
+			text-decoration: none;
+		}
+
+		a:visited {
+		    color: #C0C0C0;
+			text-decoration: none;
+		}
+
+		a:hover {
+		    color: #FFFFFF;
+			text-decoration: none;
+		}
+
+		a:active {
+		    color: #C0C0C0;
+			text-decoration: none;
+		}
+		</style>
+	</head>
+	<body>
+		<div id="touch">
+		<canvas id="myCanvas"></canvas>
+		</div>
+		<audio id="AudioElement"></audio>
+		<div id='logout' class="notSelectable">
+			<a href="/logout">&#9746</a>
+		</div>
+		<div id='help' class="notSelectable" style="opacity:0.25;">
+			<a href="/static/help.html">Help</a>
+		</div>
+		<script>
+		var c=document.getElementById("myCanvas");
+		var ctx=c.getContext("2d");
+		var circle = new Path2D();
+		
+		function layout(){
+			ctx.canvas.width  = window.innerWidth;
+			ctx.canvas.height = window.innerHeight;
+			var x = c.width / 2;
+			var y = c.height / 2;
+			var radius = Math.min(c.width, c.height) / 4;
+			circle.arc(x, y, radius, 0, 2 * Math.PI);
+			ctx.lineWidth = 15;
+			ctx.rect(0, 0, c.width, c.height);
+			ctx.fill();
+			ctx.shadowOffsetX = 0;
+			ctx.shadowOffsetY = 0;
+			ctx.shadowBlur = 10;
+			ctx.shadowColor = '#ffffee';
+			
+			if (is_touch_device()){
+				console.log('Touch Enabled');
+				var el=document.getElementById("touch");
+				c.ontouchstart = function(e){
+					startrecord();
+				} 
+				c.ontouchend = function(e){
+					stoprecord();
+				}
+			}
+			else{
+				console.log('No Touch');
+				c.onmousedown = function(e){
+					startrecord();
+				} 
+				c.onmouseup = function(e){
+					stoprecord();
+				}
+			}
+		}
+			
+
+			
+			
+		function draw(col){
+			ctx.clearRect(0, 0, c.width, c.height);
+			ctx.fill();
+			ctx.strokeStyle = col;
+			ctx.stroke(circle);
+		}
+		
+		function log(data){
+			console.log('logging...')
+			console.log(data);
+		}
+		
+		function is_touch_device() {
+		  return !!('ontouchstart' in window);
+		}
+		
+		
+		window.onload = function() {
+			layout();
+			setup();
+		};
+		
+		window.onresize = function() {
+			location.reload();
+		};
+		
+		$(document).ready(function(){
+
+		   $('.notSelectable').disableSelection();
+    
+		});
+		
+		// This jQuery Plugin will disable text selection for Android and iOS devices.
+		// Stackoverflow Answer: http://stackoverflow.com/a/2723677/1195891
+		$.fn.extend({
+		    disableSelection: function() {
+		        this.each(function() {
+		            this.onselectstart = function() {
+		                return false;
+		            };
+		            this.unselectable = "on";
+		            $(this).css('-moz-user-select', 'none');
+		            $(this).css('-webkit-user-select', 'none');
+		        });
+		    }
+		});
+	
+		</script>
+		<div style="position:fixed;z-index:20;min-width:100%;min-height:200px;">
+		    <br><br><br>
+      <div id="box" class="box" onclick="alert('go')"></div>
+    <br><br><br> <br><br><br>
+    <select id="keyword"></select>
+    <button id="startBtn">Start</button>
+    <button id="stopBtn">Stop</button>
+    <span id="recording-indicator" style="border-radius: 10px; -moz-border-radius: 10px; -webkit-border-radius: 10px; width: 20px; height: 20px; background: red;"></span>
+    <h2>Spotted Keywords</h2>
+    <div id="output" style="height:150px;overflow:auto;" >
+    </div>
+    <h2>Status</h2>
+    <input id="ccput" placeholder="ccput" style="min-width:80px;border-bottom:3px solid #007eff">
+    <div id="current-status">Loading page</div>
+</div>
+<script type="text/javascript">
+  function rtd(){
+   // var put = $("#ccput");
+    var A = $("#output").html();
+    var B = "HELLO-ALEXA";
+    if(A === B){
+      setTimeout(function(){
+        //put.val('HUZZAH!');
+         
+         alert("success");
+        clearall();
+      },500);
+    }   
+}           
+
+function clearall(){
+          $("#stopBtn").click();
+        setTimeout(function(){
+          $("#startBtn").click();
+         // $("#box").mouseUp();
+
+      },1500);
+}
+</script>
+		 <script>
+      // These will be initialized later
+      var recognizer, recorder, callbackManager, audioContext, outputContainer;
+      // Only when both recorder and recognizer do we have a ready application
+      var isRecorderReady = isRecognizerReady = false;
+
+      // A convenience function to post a message to the recognizer and associate
+      // a callback to its response
+      function postRecognizerJob(message, callback) {
+        var msg = message || {};
+        if (callbackManager) msg.callbackId = callbackManager.add(callback);
+        if (recognizer) recognizer.postMessage(msg);
+
+      };
+      // This function initializes an instance of the recorder
+      // it posts a message right away and calls onReady when it
+      // is ready so that onmessage can be properly set
+      function spawnWorker(workerURL, onReady) {
+          recognizer = new Worker(workerURL);
+          recognizer.onmessage = function(event) {
+            onReady(recognizer);
+          };
+          recognizer.postMessage('');
+      };
+
+      // To display the hypothesis sent by the recognizer
+      function updateCount(count) {
+        if (outputContainer){ outputContainer.innerHTML = count; rtd()};
+
+      };
+
+      // This updates the UI when the app might get ready
+      // Only when both recorder and recognizer are ready do we enable the buttons
+      function updateUI() {
+        if (isRecorderReady && isRecognizerReady) startBtn.disabled = stopBtn.disabled = false;
+      };
+
+      // This is just a logging window where we display the status
+      function updateStatus(newStatus) {
+        document.getElementById('current-status').innerHTML += "<br/>" + newStatus;
+      };
+
+      // A not-so-great recording indicator
+      function displayRecording(display) {
+        if (display) document.getElementById('recording-indicator').innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+        else document.getElementById('recording-indicator').innerHTML = "";
+      };
+
+      // Callback function once the user authorises access to the microphone
+      // in it, we instanciate the recorder
+      function startUserMedia(stream) {
+        var input = audioContext.createMediaStreamSource(stream);
+        // Firefox hack https://support.mozilla.org/en-US/questions/984179
+        window.firefox_audio_hack = input; 
+        var audioRecorderConfig = {errorCallback: function(x) {updateStatus("Error from recorder: " + x);}};
+        recorder = new AudioRecorder(input, audioRecorderConfig);
+        // If a recognizer is ready, we pass it to the recorder
+        if (recognizer) recorder.consumers = [recognizer];
+        isRecorderReady = true;
+        updateUI();
+        updateStatus("Audio recorder ready");
+      };
+
+      // This starts recording. We first need to get the id of the keyword search to use
+      var startRecording = function() {
+        var id = document.getElementById('keyword').value;
+        if (recorder && recorder.start(id)) displayRecording(true);
+      };
+
+      // Stops recording
+      var stopRecording = function() {
+        recorder && recorder.stop();
+        displayRecording(false);
+      };
+
+      // Called once the recognizer is ready
+      // We then add the grammars to the input select tag and update the UI
+      var recognizerReady = function() {
+           updateKeywords();
+           isRecognizerReady = true;
+           updateUI();
+           updateStatus("Recognizer ready");
+           $("#startBtn").click();
+      };
+
+      // We get the grammars defined below and fill in the input select tag
+      var updateKeywords = function() {
+        var selectTag = document.getElementById('keyword');
+        for (var i = 0 ; i < keywordIds.length ; i++) {
+            var newElt = document.createElement('option');
+            newElt.value=keywordIds[i].id;
+            newElt.innerHTML = keywordIds[i].title;
+            selectTag.appendChild(newElt);
+        }                          
+      };
+
+      // This adds a keyword search from the array
+      // We add them one by one and call it again as
+      // a callback.
+      // Once we are done adding all grammars, we can call
+      // recognizerReady()
+      var feedKeyword = function(g, index, id) {
+        if (id && (keywordIds.length > 0)) keywordIds[0].id = id.id;
+        if (index < g.length) {
+          keywordIds.unshift({title: g[index].title})
+	         postRecognizerJob({command: 'addKeyword', data: g[index].g},
+                             function(id) {feedKeyword(keywords, index + 1, {id:id});});
+        } else {
+          recognizerReady();
+        }
+      };
+
+      // This adds words to the recognizer. When it calls back, we add grammars
+      var feedWords = function(words) {
+           postRecognizerJob({command: 'addWords', data: words},
+                        function() {feedKeyword(keywords, 0);});
+      };
+
+      // This initializes the recognizer. When it calls back, we add words
+      var initRecognizer = function() {
+          // You can pass parameters to the recognizer, such as : {command: 'initialize', data: [["-hmm", "my_model"], ["-fwdflat", "no"]]}
+          postRecognizerJob({command: 'initialize', data: [["-kws_threshold", "2"]]},
+                            function() {
+                                        if (recorder) recorder.consumers = [recognizer];
+                                        feedWords(wordList);});
+      };
+
+      // When the page is loaded, we spawn a new recognizer worker and call getUserMedia to
+      // request access to the microphone
+      window.onload = function() {
+        outputContainer = document.getElementById("output");
+        updateStatus("Initializing web audio and speech recognizer, waiting for approval to access the microphone");
+        callbackManager = new CallbackManager();
+        spawnWorker("js/recognizer.js", function(worker) {
+            // This is the onmessage function, once the worker is fully loaded
+            worker.onmessage = function(e) {
+                // This is the case when we have a callback id to be called
+                if (e.data.hasOwnProperty('id')) {
+                  var clb = callbackManager.get(e.data['id']);
+                  var data = {};
+                  if ( e.data.hasOwnProperty('data')) data = e.data.data;
+                  if(clb) clb(data);
+                }
+                // This is a case when the recognizer has a new count number
+                if (e.data.hasOwnProperty('hyp')) {
+                  var newCount = e.data.hyp;
+                  if (e.data.hasOwnProperty('final') &&  e.data.final) newCount = "Final: " + newCount;
+                  updateCount(newCount);
+                }
+                // This is the case when we have an error
+                if (e.data.hasOwnProperty('status') && (e.data.status == "error")) {
+                  updateStatus("Error in " + e.data.command + " with code " + e.data.code);
+                }
+            };
+            // Once the worker is fully loaded, we can call the initialize function
+            initRecognizer();
+        });
+
+        // The following is to initialize Web Audio
+        try {
+          window.AudioContext = window.AudioContext || window.webkitAudioContext;
+          navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+          window.URL = window.URL || window.webkitURL;
+          audioContext = new AudioContext();
+        } catch (e) {
+          updateStatus("Error initializing Web Audio browser");
+        }
+        if (navigator.getUserMedia) navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
+                                        updateStatus("No live audio input in this browser");
+                                    });
+        else updateStatus("No web audio support in this browser");
+
+      // Wiring JavaScript to the UI
+      var startBtn = document.getElementById('startBtn');
+      var stopBtn = document.getElementById('stopBtn');
+      startBtn.disabled = true;
+      stopBtn.disabled = true;
+      startBtn.onclick = startRecording;
+      stopBtn.onclick = stopRecording;
+      };
+
+       // This is the list of words that need to be added to the recognizer
+       // This follows the CMU dictionary format
+      var wordList = [["OKAY-ALEXA", "OW K EY AH L EH K S AH"], ["HELLO-ALEXA", "HH AH L OW AH L EH K S AH"], ["ATTENTION", "AH T EH N SH AH N"], ["HEY-ALEXA", "HH EY AH L EH K S AH"], ["MISTER-ROBOT", "M IH S T ER R OW B AA T"]];
+      var keywords = [{title: "HELLO-ALEXA", g: "HELLO-ALEXA"}];
+      var keywordIds = [];
+    </script>
+
+    <!-- These are the two JavaScript files you must load in the HTML,
+    The recognizer is loaded through a Web Worker -->
+    <script src="js/audioRecorderB.js"></script>
+    <script src="js/callbackManagerB.js"></script>
+	</body>
+</HTML>
