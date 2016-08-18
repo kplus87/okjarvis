@@ -13,13 +13,17 @@ function swipedetect(el, callback){
     startTime,
     handleswipe = callback || function(swipedir){}
   
+
     touchsurface.addEventListener('touchstart', function(e){
+        startrecord();
+        /*
         var touchobj = e.changedTouches[0]
         swipedir = 'none'
         dist = 0
         startX = touchobj.pageX
         startY = touchobj.pageY
         startTime = new Date().getTime() // record time when finger first makes contact with surface
+        */
         e.preventDefault()
     }, false)
   
