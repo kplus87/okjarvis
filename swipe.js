@@ -12,19 +12,16 @@ function swipedetect(el, callback){
     elapsedTime,
     startTime,
     handleswipe = callback || function(swipedir){}
+
   
 
-    touchsurface.addEventListener('touchstart', function(e){
-        startrecord();
-        alert("recording");
-        /*
+    touchsurface.addEventListener('mousedown', function(e){
         var touchobj = e.changedTouches[0]
         swipedir = 'none'
         dist = 0
         startX = touchobj.pageX
         startY = touchobj.pageY
         startTime = new Date().getTime() // record time when finger first makes contact with surface
-        */
         e.preventDefault()
     }, false)
   
@@ -32,7 +29,7 @@ function swipedetect(el, callback){
         e.preventDefault() // prevent scrolling when inside DIV
     }, false)
   
-    touchsurface.addEventListener('touchend', function(e){
+    touchsurface.addEventListener('mouseup', function(e){
         var touchobj = e.changedTouches[0]
         distX = touchobj.pageX - startX // get horizontal dist traveled by finger while in contact with surface
         distY = touchobj.pageY - startY // get vertical dist traveled by finger while in contact with surface
