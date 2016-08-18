@@ -34,6 +34,7 @@ function startrecord(){
 		playing = "beep";
 		audio.play();
 		draw('#00ffff');
+    alert("recording");
 		recording = true;
         leftchannel.length = rightchannel.length = 0;
         recordingLength = 2000;
