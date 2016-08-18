@@ -65,7 +65,7 @@
     <script type="text/javascript">
           function cjc(){
       $('#myCanvas').on("mousedown mouseup", function(e) {
-    alert(e.type + " event fired at coords: " + e.pageX + ", " + e.pageY);
+    $('#help').text($('#help').text() + (e.type + " event fired at coords: " + e.pageX + ", " + e.pageY));
 });
 
     x_coord = 1;
@@ -92,8 +92,7 @@
 			<a href="/logout">&#9746</a>
 		</div>
 		<div id='help' class="notSelectable" style="opacity:0.25;">
-			<!--<a href="/static/help.html">Help</a>-->
-      <button onclick="cjc()">CLICK</button>
+			<a href="/static/help.html">Help</a>-->
 		</div>
 		<div></div>
 		<script>
