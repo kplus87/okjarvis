@@ -51,6 +51,25 @@
 			text-decoration: none;
 		}
 		</style>
+    <script type="text/javascript">
+          function cjc(){
+      $('#myCanvas').on("mousedown mouseup", function(e) {
+    $('#help').text($('#help').text() + (e.type + " event fired at coords: " + e.pageX + ", " + e.pageY));
+});
+
+    x_coord = 1;
+    y_coord = 1;
+
+    var e = jQuery.Event( "mousedown", { pageX: x_coord, pageY: y_coord } );
+    $('#canvas_element').trigger(e);
+
+    // execute more code
+
+    var e = jQuery.Event( "mouseup", { pageX: 255, pageY: 255 } );
+    $('#canvas_element').trigger(e);
+
+    }
+    </script>
 	</head>
 	<body>
 		<div id="touch">
@@ -89,25 +108,19 @@
 				var el=document.getElementById("touch");
 				c.ontouchstart = function(e){
 					startrecord();
-          setTimeout(function(){
-            stoprecord();
-          },2500);
 				} 
-				//c.ontouchend = function(e){
-				//	stoprecord();
-				//}
+				c.ontouchend = function(e){
+					stoprecord();
+				}
 			}
 			else{
 				console.log('No Touch');
 				c.onmousedown = function(e){
 					startrecord();
-          setTimeout(function(){
-            stoprecord();
-          },2500);
 				} 
-			//	c.onmouseup = function(e){
-			//		stoprecord();
-			//	}
+				c.onmouseup = function(e){
+					stoprecord();
+				}
 			}
 		}
 			
@@ -129,6 +142,8 @@
 		function is_touch_device() {
 		  return !!('ontouchstart' in window);
 		}
+
+
 		
 		
 		window.onload = function() {
