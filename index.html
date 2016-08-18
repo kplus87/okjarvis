@@ -13,6 +13,9 @@
 		    border: 3px solid #ccc;
 		    border-radius: 10px;
 		}
+		.boxer{
+			position:fixed !important;z-index:20 !important;min-width:100%;min-height:200px;background: #fff;top:0;left:0;
+		}
 		#help {
 			position: absolute;
 		    top: 5px;
@@ -60,6 +63,7 @@
 		<div id='help' class="notSelectable" style="opacity:0.25;">
 			<a href="/static/help.html">Help</a>
 		</div>
+		<div></div>
 		<script>
 		var c=document.getElementById("myCanvas");
 		var ctx=c.getContext("2d");
@@ -152,7 +156,7 @@
 		});
 	
 		</script>
-		<div style="position:fixed;z-index:20;min-width:100%;min-height:200px;">
+		<div class="boxer">
 		    <br><br><br>
       <div id="box" class="box" onclick="alert('go')"></div>
     <br><br><br> <br><br><br>
