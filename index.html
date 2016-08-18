@@ -9,6 +9,17 @@
 		  height: 100%;
 		  margin: 0px;
 		}
+    button{
+      z-index: 300 !important;
+      position: fixed !important;
+      top:0 !important;
+      left: 0 !important;
+      color: #000 !important;
+      background: #fff !important 
+    }
+    button:active{
+      background: #007eff !important;
+    }
 		canvas {
 		    border: 3px solid #ccc;
 		    border-radius: 10px;
@@ -72,6 +83,7 @@
     </script>
 	</head>
 	<body>
+  <button onclick="cjc();">CLICK ME</button>
 		<div id="touch">
 		<canvas id="myCanvas"></canvas>
 		</div>
